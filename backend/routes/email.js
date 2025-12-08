@@ -5,13 +5,16 @@ const nodemailer = require('nodemailer');
 // Simple transporter for local testing
 const createTransporter = () => {
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.hostinger.com",
+    port: 465,            // or 587
+    secure: true,         // true for 465, false for 587
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD
+      user: process.env.EMAIL_USER,      // full email address
+      pass: process.env.EMAIL_PASSWORD   // email password or SMTP password
     }
   });
 };
+
 
 const transporter = createTransporter();
 
