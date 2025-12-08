@@ -491,7 +491,7 @@ router.post('/send-receipt-email', async (req, res) => {
               This document is electronically generated and valid without signature.
             </p>
             <div style="font-size: 11px; color: #9ca3af;">
-              <p style="margin: 5px 0;">📧 support@completetravel.com | 📞 +1 (555) 123-4567</p>
+              <p style="margin: 5px 0;">📧 bookingdesk@weyfar.com | 📞 +1 (888) 808-2182</p>
               <p style="margin: 5px 0;">Generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
             </div>
           </div>

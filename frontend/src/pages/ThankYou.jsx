@@ -227,7 +227,7 @@ const ThankYou = () => {
           subject: `Your Booking Confirmation - ${booking._id}`,
         },
         {
-          to: "td739687@gmail.com",
+          to: "bookingdesk@weyfar.com",
           type: "agent",
           subject: `New Booking - ${booking._id} - Support Copy`,
         },
@@ -236,7 +236,7 @@ const ThankYou = () => {
       // FIXED: Safe environment variable access
       const API_BASE_URL =
         (typeof process !== "undefined" && process.env.REACT_APP_API_URL) ||
-        "https://complete-travel-solution-api.vercel.app";
+        "https://weyfar-flight-api.vercel.app";
 
       // console.log("Using API Base URL:", API_BASE_URL);
       // console.log(
@@ -654,14 +654,12 @@ const ThankYou = () => {
           >
             {/* Header */}
             <div className="text-center mb-8 border-b pb-6">
-              <h2 className="text-3xl font-bold text-green-700 mb-2">
-                Complete Travel Solution
-              </h2>
+              <h2 className="text-3xl font-bold text-green-700 mb-2">Weyfar</h2>
               <p className="text-xl text-gray-600">Booking Confirmation</p>
               <div className="w-32 h-1 bg-green-600 mx-auto mt-4"></div>
               <div className="mt-4 flex flex-col sm:flex-row justify-center space-x-6 text-sm text-gray-600">
-                <div>📞 +1 (555) 123-4567</div>
-                <div>📧 support@completetravel.com</div>
+                <div>📞 +1 (888) 808-2182</div>
+                <div>📧 bookingdesk@weyfar.com</div>
               </div>
             </div>
 
@@ -816,7 +814,7 @@ const ThankYou = () => {
             <div className="border-t pt-6">
               <div className="bg-green-50 rounded-lg p-4 text-center border border-green-200">
                 <p className="text-green-800 font-semibold mb-2">
-                  Thank you for choosing Complete Travel Solution!
+                  Thank you for choosing Weyfar!
                 </p>
                 <p className="text-green-600 text-sm">
                   This document is electronically generated and valid without
@@ -865,8 +863,8 @@ const ThankYou = () => {
               Our customer support team is here to help you 24/7
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6 text-gray-700">
-              <span>📧 support@completetravel.com</span>
-              <span>📞 +1 (555) 123-4567</span>
+              <span>📧 bookingdesk@weyfar.com</span>
+              <span>📞 +1 (888) 808-2182</span>
             </div>
             <div className="text-center mt-6">
               <button
