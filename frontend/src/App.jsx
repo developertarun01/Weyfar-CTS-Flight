@@ -30,7 +30,7 @@ function NavigationHandler() {
     }
   }, [location, navigationType]);
 
-  return loading ? <div className="page-loading-overlay">Loading…</div> : null;
+  return loading ? <div className="page-loading-overlay"></div> : null;
 }
 
 function App() {

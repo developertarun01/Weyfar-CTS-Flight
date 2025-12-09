@@ -535,7 +535,7 @@ const PopularAirline = ({ props }) => {
       const fallbackData = {
         tripType: "roundTrip",
         origin: "JFK",
-        destination: "LON",
+        destination: "LHR",
         fromDate: today,
         toDate: returnDateStr,
         adults: 1,
