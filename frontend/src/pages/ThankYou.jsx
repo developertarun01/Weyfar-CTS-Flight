@@ -794,11 +794,11 @@ const ThankYou = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>Phone:</span>
-                    <span>${booking.contactInfo.phone}</span>
+                    <span>{booking.contactInfo.phone}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Email:</span>
-                    <span>${booking.contactInfo.email}</span>
+                    <span>{booking.contactInfo.email}</span>
                   </div>
                 </div>
               </div>
