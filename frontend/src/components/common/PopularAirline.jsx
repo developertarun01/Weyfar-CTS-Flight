@@ -494,7 +494,7 @@ const PopularAirline = ({ props }) => {
       const searchData = {
         tripType: "roundTrip",
         origin: originAirport,
-        destination: "JFK",
+        destination: "LHR",
         fromDate: today,
         toDate: returnDateStr,
         adults: 1,
@@ -542,7 +542,6 @@ const PopularAirline = ({ props }) => {
         children: 0,
         travelClass: "ECONOMY",
         airline: airlineName,
-        usedFallback: true,
       };
 
       navigate("/results", {
