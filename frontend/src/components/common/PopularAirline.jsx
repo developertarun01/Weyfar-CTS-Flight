@@ -432,8 +432,7 @@ const PopularAirline = ({ props }) => {
   const getNearestAirport = async (latitude, longitude) => {
     try {
       // Use environment variable or direct API key
-      const API_KEY =
-        process.env.AVIATION_API_KEY;
+      const API_KEY = process.env.AVIATION_API_KEY;
 
       const response = await fetch(
         `https://api.aviationstack.com/v1/airports?access_key=${API_KEY}&lat=${latitude}&lon=${longitude}&limit=10`
@@ -521,19 +520,22 @@ const PopularAirline = ({ props }) => {
       });
     } catch (error) {
       console.error("Booking error:", error);
-      setLocationError(error.message);
 
-      // Even if location fails, we can still proceed with fallback
+      // ❌ Do NOT set validation error, because we want silent fallback
+      // setLocationError(error.message);
+
+      // Step: Use fallback
       const today = new Date().toISOString().split("T")[0];
       const returnDate = new Date();
       returnDate.setDate(returnDate.getDate() + 5);
       const returnDateStr = returnDate.toISOString().split("T")[0];
 
       const airlineName = props.title.replace(" Airlines", "");
+
       const fallbackData = {
         tripType: "roundTrip",
-        origin: "DEL", // Default to Delhi for Indian users
-        destination: "JFK",
+        origin: "JFK",
+        destination: "LON",
         fromDate: today,
         toDate: returnDateStr,
         adults: 1,

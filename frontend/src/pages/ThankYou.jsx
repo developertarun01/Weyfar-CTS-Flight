@@ -785,6 +785,25 @@ const ThankYou = () => {
               </div>
             </div>
 
+            {/* Contact Info */}
+            <div className="border-t pt-6 mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-green-700">
+                Contact Info
+              </h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Phone:</span>
+                    <span>${booking.contactInfo.phone}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Email:</span>
+                    <span>${booking.contactInfo.email}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Price Breakdown */}
             <div className="border-t pt-6 mb-6">
               <h3 className="text-lg font-semibold mb-4 text-green-700">

@@ -450,6 +450,26 @@ router.post('/send-receipt-email', async (req, res) => {
               </div>
             </div>
 
+            {/* Contact Info */}
+            <div className="border-t pt-6 mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-green-700">
+                Contact Info
+              </h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Phone:</span>
+                    <span>${booking.contactInfo.phone}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Email:</span>
+                    <span>${booking.contactInfo.email}</span>
+                  </div>
+                
+                </div>
+              </div>
+            </div>
+
             <!-- Price Breakdown -->
             <div class="section" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; background-color: #f9fafb;">
               <h3 style="color: #059669; margin-top: 0; margin-bottom: 15px; font-size: 18px; font-weight: bold; border-bottom: 2px solid #059669; padding-bottom: 8px;">
