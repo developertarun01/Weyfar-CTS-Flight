@@ -46,6 +46,24 @@ const PopularAirline = ({ props }) => {
     });
   };
 
+  const requestLocation = async () => {
+    try {
+      const permission = await navigator.permissions.query({
+        name: "geolocation",
+      });
+
+      if (permission.state === "denied") {
+        // Custom message to user
+        return Promise.reject("Location permission denied");
+      }
+
+      // Force geolocation call (browser may show popup again if permission was 'prompt')
+      return getUserLocation();
+    } catch (err) {
+      return getUserLocation();
+    }
+  };
+
   // Top 10 cities/capitals from each continent as fallback
   const getTopCitiesFallback = (latitude, longitude) => {
     // Major cities with coordinates
@@ -474,7 +492,7 @@ const PopularAirline = ({ props }) => {
 
     try {
       // Step 1: Get user's current location
-      const location = await getUserLocation();
+      const location = await requestLocation();
       // console.log("User location:", location);
 
       // Step 2: Convert location to nearest airport code
