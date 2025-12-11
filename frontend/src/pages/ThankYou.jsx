@@ -1,14 +1,8 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   CheckCircle,
-  Download,
   Home,
-  CreditCard,
-  Calendar,
-  MapPin,
-  Users,
-  Shield,
   Camera,
   FileText,
 } from "lucide-react";
@@ -16,6 +10,29 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 const ThankYou = () => {
+  useEffect(() => {
+    // wait a tick to ensure gtag loaded
+    const t = setTimeout(() => {
+      if (typeof window.gtag === "function") {
+        window.gtag("event", "conversion", {
+          send_to: "AW-17169411915/DhP_CMKY088bEMvegfs_",
+          value: 1.0,
+          currency: "INR",
+        });
+      } else {
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+          event: "conversion",
+          send_to: "AW-17169411915/DhP_CMKY088bEMvegfs_",
+          value: 1.0,
+          currency: "INR",
+        });
+      }
+    }, 300); // 300ms is safe; adjust if needed
+
+    return () => clearTimeout(t);
+  }, []);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { booking, payment } = location.state || {};

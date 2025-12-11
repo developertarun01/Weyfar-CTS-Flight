@@ -6,7 +6,6 @@ import {
   useNavigationType,
   useLocation,
 } from "react-router-dom";
-// import LoadingSpinner from "./components/common/LoadingSpinner";
 import Navbar from "./components/common/Navbar";
 import Footer from "./components/common/Footer";
 import Home from "./pages/Home";
@@ -16,6 +15,28 @@ import Booking from "./pages/Booking";
 import Payment from "./pages/Payment";
 import ThankYou from "./pages/ThankYou";
 import Contact from "./pages/Contact";
+
+function GtagPageView() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = window.location.pathname + window.location.search;
+
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "page_view", {
+        page_path: path,
+      });
+    } else {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "page_view",
+        page_path: path,
+      });
+    }
+  }, [location]);
+
+  return null;
+}
 
 function NavigationHandler() {
   const [loading, setLoading] = useState(false);
@@ -40,6 +61,8 @@ function App() {
       <div className="App flex flex-col min-h-screen bg-gray-50">
         <Navbar />
         <main className="flex-grow">
+          <GtagPageView />
+
           <NavigationHandler />
           <Routes>
             <Route path="/" element={<Home />} />
