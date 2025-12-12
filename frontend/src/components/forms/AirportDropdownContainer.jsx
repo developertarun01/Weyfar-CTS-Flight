@@ -14,21 +14,33 @@ const AirportDropdownContainer = () => {
   // Group suggestions by city - FIXED VERSION
   const groupedSuggestions = suggestions.reduce((groups, location) => {
     if (location.type === "city") {
-      groups.push({
-        type: "city",
-        data: location,
-        airports: [],
-      });
+      const exists = groups.some(
+        (group) =>
+          group.type === "city" &&
+          (group.data.city === location.city ||
+            group.data.name === location.name)
+      );
+
+      if (!exists) {
+        groups.push({
+          type: "city",
+          data: location,
+          airports: [],
+        });
+      }
+
+      return groups;
     } else if (location.type === "airport") {
       // Get city name safely - use the normalized city property
       const cityName = location.city;
-      
+
       if (cityName) {
         // Find if this city already exists in groups
         const cityGroup = groups.find(
-          (group) => group.type === "city" && 
-          // Compare using the city name from the data object
-          (group.data.city === cityName || group.data.name === cityName)
+          (group) =>
+            group.type === "city" &&
+            // Compare using the city name from the data object
+            (group.data.city === cityName || group.data.name === cityName)
         );
 
         if (cityGroup) {
@@ -43,7 +55,7 @@ const AirportDropdownContainer = () => {
               city: cityName, // Add city property for consistency
               country: location.country,
               type: "city",
-              code: location.cityCode || cityName.substring(0, 3).toUpperCase(),
+              code: location.cityCode || location.code,
             },
             airports: [location],
           });
@@ -90,7 +102,9 @@ const AirportDropdownContainer = () => {
         <div className="py-2">
           {groupedSuggestions.map((group, index) => {
             if (group.type === "city") {
-              const cityDisplay = airportSearchService.getDisplayLabel(group.data);
+              const cityDisplay = airportSearchService.getDisplayLabel(
+                group.data
+              );
               return (
                 <div
                   key={`city-${group.data.id}-${index}`}
@@ -128,7 +142,8 @@ const AirportDropdownContainer = () => {
                   {group.airports.length > 0 && (
                     <div className="bg-gray-50">
                       {group.airports.map((airport, airportIndex) => {
-                        const airportDisplay = airportSearchService.getDisplayLabel(airport);
+                        const airportDisplay =
+                          airportSearchService.getDisplayLabel(airport);
                         return (
                           <button
                             key={`airport-${airport.id}-${airportIndex}`}
@@ -165,7 +180,9 @@ const AirportDropdownContainer = () => {
               );
             } else {
               // Standalone airport without city grouping
-              const airportDisplay = airportSearchService.getDisplayLabel(group.data);
+              const airportDisplay = airportSearchService.getDisplayLabel(
+                group.data
+              );
               return (
                 <button
                   key={`airport-${group.data.id}-${index}`}
@@ -202,7 +219,8 @@ const AirportDropdownContainer = () => {
 
       {groupedSuggestions.length > 0 && (
         <div className="px-3 py-2 bg-gray-50 border-t text-xs text-gray-500">
-          {suggestions.length} locations found • Search by airport code, name, or city
+          {suggestions.length} locations found • Search by airport code, name,
+          or city
         </div>
       )}
     </div>
