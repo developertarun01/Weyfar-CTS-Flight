@@ -35,6 +35,7 @@ const Results = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [allResults, setAllResults] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [dynamicAirlines, setDynamicAirlines] = useState([]);
   const [filters, setFilters] = useState({
     // Common filters
     sortBy: "price",
@@ -65,14 +66,6 @@ const Results = () => {
 
   // Filter options
   const filterOptions = {
-    airlines: [
-      "Delta Air Lines",
-      "American Airlines",
-      "United Airlines",
-      "Southwest Airlines",
-      "JetBlue Airways",
-      "Frontier Airlines",
-    ],
     stops: [
       { value: "any", label: "Any stops" },
       { value: "0", label: "Non-stop" },
@@ -323,6 +316,21 @@ const Results = () => {
         }));
 
         setAllResults(resultsWithDiscount);
+        // ⭐ Build dynamic airline counts AFTER results are ready
+        if (searchType === "flights") {
+          const counts = {};
+          resultsWithDiscount.forEach((f) => {
+            const airline = f.airline || "Unknown Airline";
+            counts[airline] = (counts[airline] || 0) + 1;
+          });
+
+          setDynamicAirlines(
+            Object.entries(counts).map(([name, count]) => ({
+              name,
+              count,
+            }))
+          );
+        }
 
         // Apply initial filters
         const filteredResults = applyFilters(resultsWithDiscount);
@@ -626,36 +634,25 @@ const Results = () => {
               Airlines
             </label>
             <div className="space-y-2">
-              {filterOptions.airlines.map((airline) => (
-                <label key={airline} className="flex items-center">
-                  {/* <input
-                    type="checkbox"
-                    checked={filters.airlines.includes(airline)}
-                    onChange={(e) =>
-                      handleArrayFilterChange(
-                        "airlines",
-                        airline,
-                        e.target.checked
-                      )
-                    }
-                    className="rounded border-gray-300 text-[var(--primary)] focus:ring-[var(--primary)]"
-                  /> */}
+              {dynamicAirlines.map((item) => (
+                <label key={item.name} className="flex items-center">
                   <input
                     type="radio"
                     name="airline"
-                    checked={filters.airlines.includes(airline)}
+                    checked={filters.airlines.includes(item.name)}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        // Replace the entire array with just this airline
                         setFilters((prev) => ({
                           ...prev,
-                          airlines: [airline],
+                          airlines: [item.name], // select only this airline
                         }));
                       }
                     }}
                     className="rounded border-gray-300 text-[var(--primary)] focus:ring-[var(--primary)]"
                   />
-                  <span className="ml-2 text-sm">{airline}</span>
+                  <span className="ml-2 text-sm">
+                    {item.name} ({item.count})
+                  </span>
                 </label>
               ))}
             </div>

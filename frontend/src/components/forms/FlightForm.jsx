@@ -18,7 +18,7 @@ const FlightForm = () => {
   // Add to your component state
   const [isGuestSelectorOpen, setIsGuestSelectorOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
-  
+
   const today = new Date().toISOString().split("T")[0];
   const today2 = new Date();
   today2.setDate(today2.getDate() + 5); // ✅ add 5 days
@@ -94,7 +94,9 @@ const FlightForm = () => {
       errors.toDate = "Return date is required for round trips";
     }
 
+    // Only validate return date when tripType is roundTrip
     if (
+      formData.tripType === "roundTrip" &&
       formData.toDate &&
       formData.fromDate &&
       new Date(formData.toDate) <= new Date(formData.fromDate)
@@ -165,7 +167,10 @@ const FlightForm = () => {
             name="tripType"
             value="oneWay"
             checked={formData.tripType === "oneWay"}
-            onChange={() => handleChange("tripType", "oneWay")}
+            onChange={() => {
+              handleChange("tripType", "oneWay");
+              handleChange("toDate", ""); // remove return date
+            }}
             className="h-4 w-4 text-[var(--primary)] focus:ring-[var(--primary)]"
           />
           <span className="text-gray-700">One Way</span>
