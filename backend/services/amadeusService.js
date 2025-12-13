@@ -1,9 +1,16 @@
 const { amadeus, extractAmadeusError } = require('../config/amadeus');
 const airlineCodes = require('airline-codes');
 
+// Fix the airline name function
 function getAirlineName(airlineCode) {
-  const airline = airlineCodes.findWhere({ iata: airlineCode });
-  return airline ? airline.get('name') : airlineCode;
+  if (!airlineCode) return 'Unknown Airline';
+  
+  try {
+    const airline = airlineCodes.findWhere({ iata: airlineCode });
+    return airline ? airline.get('name') : airlineCode;
+  } catch (error) {
+    return airlineCode;
+  }
 }
 
 class AmadeusService {
@@ -906,25 +913,30 @@ class AmadeusService {
     return this.getMockCruiseData(params);
   }
 
-  // Format flight response
+  // Format flight response with deduplication
   formatFlightResponse(data) {
     if (!data || !Array.isArray(data)) {
-      // console.log('No flight data received from Amadeus');
+      console.log('No flight data received from Amadeus');
       return [];
     }
 
-    // console.log(`Received ${data.length} flight offers from Amadeus`);
+    console.log(`Received ${data.length} raw flight offers from Amadeus`);
 
-    return data.map(offer => {
+    const formattedFlights = data.map(offer => {
       const itineraries = offer.itineraries || [];
       const firstSegment = itineraries[0]?.segments?.[0] || {};
       const lastSegment = itineraries[0]?.segments?.[itineraries[0]?.segments?.length - 1] || {};
       const price = offer.price || {};
+      const airlineCode = firstSegment.carrierCode;
+
+      // Get airline name from code
+      const airlineName = getAirlineName(airlineCode) || airlineCode;
 
       return {
         id: offer.id,
-        airline: getAirlineName(firstSegment.carrierCode) || 'Unknown',
-        flightNumber: `${firstSegment.carrierCode}${firstSegment.number}`,
+        airlineCode: airlineCode,
+        airline: airlineName,
+        flightNumber: `${airlineCode}${firstSegment.number || ''}`,
         departure: {
           airport: firstSegment.departure?.iataCode,
           time: firstSegment.departure?.at,
@@ -942,8 +954,49 @@ class AmadeusService {
           currency: price.currency || 'USD'
         },
         class: offer.class?.[0] || 'ECONOMY',
-        source: 'amadeus' // Mark as real data
+        source: 'amadeus'
       };
+    });
+
+    // CRITICAL: Deduplicate flights from Amadeus
+    const uniqueFlights = this.deduplicateFlights(formattedFlights);
+
+    console.log(`Filtered ${formattedFlights.length} raw flights to ${uniqueFlights.length} unique flights`);
+
+    return uniqueFlights;
+  }
+
+  // Add this new deduplication method to your AmadeusService class
+  deduplicateFlights(flights) {
+    if (!flights || !Array.isArray(flights)) return [];
+
+    const seen = new Set();
+    const uniqueFlights = [];
+
+    for (const flight of flights) {
+      // Create a unique key based on flight details
+      const key = `${flight.airlineCode}-${flight.flightNumber}-${flight.departure.time}-${flight.arrival.time}-${flight.price.total}`;
+
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueFlights.push(flight);
+      }
+    }
+
+    // Additional filtering: Remove unrealistic flights
+    return uniqueFlights.filter(flight => {
+      // Filter out flights with incorrect arrival airports
+      if (flight.arrival.airport === 'ZVJ') {
+        console.log(`Filtering out flight with incorrect airport ZVJ: ${flight.flightNumber}`);
+        return false;
+      }
+
+      // Filter out flights with the same departure and arrival
+      if (flight.departure.airport === flight.arrival.airport) {
+        return false;
+      }
+
+      return true;
     });
   }
 
