@@ -308,20 +308,8 @@ const Results = () => {
           processedData = [];
         }
 
-        // In Results.jsx, inside the fetchResults function, after processedData:
-        const uniqueResults = processedData.filter((flight, index, self) => {
-          const key = `${flight.airlineCode}-${flight.flightNumber}-${flight.departure.time}`;
-          return (
-            index ===
-            self.findIndex(
-              (f) =>
-                `${f.airlineCode}-${f.flightNumber}-${f.departure.time}` === key
-            )
-          );
-        });
-
         // Add discounted prices to results
-        const resultsWithDiscount = uniqueResults.map((item) => ({
+        const resultsWithDiscount = processedData.map((item) => ({
           ...item,
           originalPrice: getOriginalPrice(item),
           discountedPrice: calculateDiscountedPrice(getOriginalPrice(item)),
