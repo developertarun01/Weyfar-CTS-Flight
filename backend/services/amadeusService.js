@@ -159,8 +159,8 @@ class AmadeusService {
         departureDate: params.fromDate,
         adults: params.adults || 1,
         children: params.children || 0,
-        travelClass: params.travelClass || 'ECONOMY',
-        max: 150
+        travelClass: params.travelClass || 'ECONOMY'
+        // max: 150
       };
 
       // Add return date for round trips
@@ -966,7 +966,7 @@ class AmadeusService {
     return uniqueFlights;
   }
 
-  // Add this new deduplication method to your AmadeusService class
+  // Fix the deduplicateFlights method - it should allow same airline, different flights
   deduplicateFlights(flights) {
     if (!flights || !Array.isArray(flights)) return [];
 
@@ -974,12 +974,17 @@ class AmadeusService {
     const uniqueFlights = [];
 
     for (const flight of flights) {
-      // Create a unique key based on flight details
-      const key = `${flight.airlineCode}-${flight.flightNumber}-${flight.departure.time}-${flight.arrival.time}-${flight.price.total}`;
+      // Create a unique key that allows same airline but different flights
+      // Include airline, flight number, departure time, and arrival time
+      // This allows multiple flights from the same airline with different schedules
+      const key = `${flight.airlineCode}-${flight.flightNumber}-${flight.departure.time}-${flight.arrival.time}`;
 
       if (!seen.has(key)) {
         seen.add(key);
         uniqueFlights.push(flight);
+      } else {
+        // Debug log to see what's being filtered out
+        console.log(`Filtering out duplicate flight: ${flight.airlineCode} ${flight.flightNumber} at ${flight.departure.time}`);
       }
     }
 
@@ -993,6 +998,12 @@ class AmadeusService {
 
       // Filter out flights with the same departure and arrival
       if (flight.departure.airport === flight.arrival.airport) {
+        console.log(`Filtering out flight with same departure/arrival: ${flight.flightNumber}`);
+        return false;
+      }
+
+      // Filter out flights with invalid times
+      if (!flight.departure.time || !flight.arrival.time) {
         return false;
       }
 
