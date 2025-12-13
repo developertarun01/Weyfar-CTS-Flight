@@ -39,8 +39,8 @@ const Results = () => {
   const [filters, setFilters] = useState({
     // Common filters
     sortBy: "price",
-    minPrice: 0,
-    maxPrice: 10000,
+    minPrice: 0, // Will be updated dynamically
+    maxPrice: 10000, // Will be updated dynamically
 
     // Flight specific filters
     airlines: [],
@@ -109,6 +109,29 @@ const Results = () => {
     const price = parseFloat(originalPrice) || 0;
     const discounted = price * 0.8; // 20% discount
     return discounted.toFixed(2);
+  };
+
+  // Function to calculate price range from results
+  const calculatePriceRange = (results) => {
+    if (!results || results.length === 0) {
+      return { min: 0, max: 10000 };
+    }
+
+    const prices = results.map(
+      (item) =>
+        parseFloat(item.discountedPrice) || parseFloat(item.originalPrice) || 0
+    );
+
+    const minPrice = Math.floor(Math.min(...prices));
+    const maxPrice = Math.ceil(Math.max(...prices));
+
+    // Add some buffer to the max price for better UX
+    const paddedMaxPrice = Math.ceil(maxPrice * 1.1); // 10% buffer
+
+    return {
+      min: Math.max(0, minPrice - 10), // Small buffer for min
+      max: paddedMaxPrice > minPrice ? paddedMaxPrice : minPrice + 100,
+    };
   };
 
   // Function to get original price for display
@@ -315,7 +338,18 @@ const Results = () => {
           discountedPrice: calculateDiscountedPrice(getOriginalPrice(item)),
         }));
 
+        // ⭐ Calculate dynamic price range
+        const priceRange = calculatePriceRange(resultsWithDiscount);
+
         setAllResults(resultsWithDiscount);
+
+        // ⭐ Update filters with dynamic price range
+        setFilters((prev) => ({
+          ...prev,
+          minPrice: priceRange.min,
+          maxPrice: priceRange.max,
+        }));
+
         // ⭐ Build dynamic airline counts AFTER results are ready
         if (searchType === "flights") {
           const counts = {};
@@ -393,10 +427,16 @@ const Results = () => {
   };
 
   const resetFilters = () => {
+    // Calculate current price range from allResults
+    const currentPriceRange =
+      allResults.length > 0
+        ? calculatePriceRange(allResults)
+        : { min: 0, max: 10000 };
+
     setFilters({
       sortBy: "price",
-      minPrice: 0,
-      maxPrice: 10000,
+      minPrice: currentPriceRange.min,
+      maxPrice: currentPriceRange.max,
       airlines: [],
       stops: "any",
       duration: 24,
@@ -412,9 +452,17 @@ const Results = () => {
   };
 
   const getActiveFilterCount = () => {
+    const currentPriceRange =
+      allResults.length > 0
+        ? calculatePriceRange(allResults)
+        : { min: 0, max: 10000 };
+
     let count = 0;
-    if (filters.minPrice > 0) count++;
-    if (filters.maxPrice < 10000) count++;
+
+    // Compare with dynamic range instead of hardcoded 0-10000
+    if (filters.minPrice > currentPriceRange.min) count++;
+    if (filters.maxPrice < currentPriceRange.max) count++;
+
     if (filters.sortBy !== "price") count++;
 
     switch (searchType) {
@@ -585,24 +633,74 @@ const Results = () => {
       {/* Price Range */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Price Range (${filters.minPrice} - ${filters.maxPrice})
+          Price Range
         </label>
-        <div className="space-y-2">
+
+        {/* Numeric inputs for precise control */}
+        <div className="flex space-x-4 mb-3">
+          <div className="flex-1">
+            <label className="block text-xs text-gray-500 mb-1">
+              Min Price ($)
+            </label>
+            <input
+              type="number"
+              min={0}
+              max={filters.maxPrice}
+              value={filters.minPrice}
+              onChange={(e) =>
+                handleFilterChange("minPrice", parseInt(e.target.value) || 0)
+              }
+              className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-xs text-gray-500 mb-1">
+              Max Price ($)
+            </label>
+            <input
+              type="number"
+              min={filters.minPrice}
+              value={filters.maxPrice}
+              onChange={(e) =>
+                handleFilterChange(
+                  "maxPrice",
+                  parseInt(e.target.value) || filters.maxPrice
+                )
+              }
+              className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Range sliders */}
+        <div className="space-y-4">
           <input
             type="range"
-            min="0"
-            max="10000"
-            step="100"
+            min={0}
+            max={filters.maxPrice}
+            step="10"
+            value={filters.minPrice}
+            onChange={(e) =>
+              handleFilterChange("minPrice", parseInt(e.target.value))
+            }
+            className="w-full"
+          />
+          <input
+            type="range"
+            min={filters.minPrice}
+            max={calculatePriceRange(allResults).max}
+            step="10"
             value={filters.maxPrice}
             onChange={(e) =>
               handleFilterChange("maxPrice", parseInt(e.target.value))
             }
             className="w-full"
           />
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>$0</span>
-            <span>${filters.maxPrice}</span>
-          </div>
+        </div>
+
+        <div className="flex justify-between text-sm text-gray-600 mt-2">
+          <span>${filters.minPrice}</span>
+          <span>${filters.maxPrice}</span>
         </div>
       </div>
 
@@ -637,17 +735,16 @@ const Results = () => {
               {dynamicAirlines.map((item) => (
                 <label key={item.name} className="flex items-center">
                   <input
-                    type="radio"
+                    type="checkbox"
                     name="airline"
                     checked={filters.airlines.includes(item.name)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setFilters((prev) => ({
-                          ...prev,
-                          airlines: [item.name], // select only this airline
-                        }));
-                      }
-                    }}
+                    onChange={(e) =>
+                      handleArrayFilterChange(
+                        "airlines",
+                        item.name,
+                        e.target.checked
+                      )
+                    }
                     className="rounded border-gray-300 text-[var(--primary)] focus:ring-[var(--primary)]"
                   />
                   <span className="ml-2 text-sm">
