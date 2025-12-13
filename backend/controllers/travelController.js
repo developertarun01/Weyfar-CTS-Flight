@@ -33,6 +33,12 @@ exports.searchAirport = async (req, res) => {
 
 // Search flights
 exports.searchFlights = async (req, res, next) => {
+  console.log('🔍 Flight search API called:', {
+    origin: req.body.origin,
+    destination: req.body.destination,
+    fromDate: req.body.fromDate,
+    timestamp: new Date().toISOString()
+  });
   try {
     // Validate request parameters
     const validation = validateSearchParams('flight', req.body);

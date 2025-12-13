@@ -988,97 +988,127 @@ class AmadeusService {
     });
   }
 
-  // Mock flight data for development
+  // In amadeusService.js - REPLACE the getMockFlightData function
   getMockFlightData(params) {
-    const basePrice = 300 + Math.floor(Math.random() * 400);
-    const returnPrice = params.tripType === 'roundTrip' ? basePrice + 100 : 0;
+    const { origin, destination, fromDate, toDate, tripType, adults = 1 } = params;
 
-    const results = [
-      {
-        id: 'mock-1',
-        airline: 'AA',
-        flightNumber: 'AA123',
-        departure: {
-          airport: params.origin,
-          time: `${params.fromDate}T08:00:00`,
-          terminal: '1'
-        },
-        arrival: {
-          airport: params.destination,
-          time: `${params.fromDate}T11:30:00`,
-          terminal: '2'
-        },
-        duration: 'PT3H30M',
-        stops: 0,
-        price: {
-          total: basePrice.toFixed(2),
-          currency: 'USD'
-        },
-        class: params.travelClass || 'ECONOMY',
-        source: 'mock',
-        return: params.tripType === 'roundTrip' ? {
-          departure: {
-            airport: params.destination,
-            time: `${params.toDate}T14:00:00`,
-            terminal: '2'
-          },
-          arrival: {
-            airport: params.origin,
-            time: `${params.toDate}T17:30:00`,
-            terminal: '1'
-          },
-          duration: 'PT3H30M',
-          stops: 0,
-          price: {
-            total: returnPrice.toFixed(2),
-            currency: 'USD'
-          }
-        } : null
-      },
-      {
-        id: 'mock-2',
-        airline: 'DL',
-        flightNumber: 'DL456',
-        departure: {
-          airport: params.origin,
-          time: `${params.fromDate}T14:00:00`,
-          terminal: '3'
-        },
-        arrival: {
-          airport: params.destination,
-          time: `${params.fromDate}T18:45:00`,
-          terminal: '1'
-        },
-        duration: 'PT4H45M',
-        stops: 1,
-        price: {
-          total: (basePrice - 40).toFixed(2),
-          currency: 'USD'
-        },
-        class: params.travelClass || 'ECONOMY',
-        source: 'mock',
-        return: params.tripType === 'roundTrip' ? {
-          departure: {
-            airport: params.destination,
-            time: `${params.toDate}T09:00:00`,
-            terminal: '1'
-          },
-          arrival: {
-            airport: params.origin,
-            time: `${params.toDate}T12:15:00`,
-            terminal: '3'
-          },
-          duration: 'PT3H15M',
-          stops: 0,
-          price: {
-            total: (returnPrice - 40).toFixed(2),
-            currency: 'USD'
-          }
-        } : null
-      }
+    // Enhanced airlines database with proper codes
+    const airlines = [
+      { code: 'AA', name: 'American Airlines' },
+      { code: 'DL', name: 'Delta Air Lines' },
+      { code: 'UA', name: 'United Airlines' },
+      { code: 'EK', name: 'Emirates' },
+      { code: 'LH', name: 'Lufthansa' },
+      { code: 'BA', name: 'British Airways' },
+      { code: 'AF', name: 'Air France' },
+      { code: 'QR', name: 'Qatar Airways' },
+      { code: 'EY', name: 'Etihad Airways' },
+      { code: 'TK', name: 'Turkish Airlines' },
+      { code: 'VS', name: 'Virgin Atlantic' },
+      { code: 'B6', name: 'JetBlue Airways' },
+      { code: 'WN', name: 'Southwest Airlines' },
+      { code: 'AC', name: 'Air Canada' },
+      { code: 'JL', name: 'Japan Airlines' }
     ];
 
-    // console.log(`Generated ${results.length} mock flight offers`);
+    // Generate realistic base price based on route
+    const getBasePrice = (origin, destination) => {
+      const routeFactors = {
+        'JFK-LAX': 350, 'JFK-LHR': 600, 'JFK-CDG': 550,
+        'LAX-JFK': 350, 'LAX-LHR': 700, 'LAX-SYD': 1200,
+        'LHR-JFK': 600, 'LHR-DXB': 450, 'LHR-SIN': 800,
+        'default': 300
+      };
+
+      const route = `${origin}-${destination}`;
+      return routeFactors[route] || routeFactors.default;
+    };
+
+    const basePrice = getBasePrice(origin, destination);
+    const results = [];
+
+    // Generate 10-15 unique flights instead of just 2
+    const numFlights = 10 + Math.floor(Math.random() * 6);
+
+    for (let i = 0; i < numFlights; i++) {
+      const airline = airlines[i % airlines.length];
+      const flightNum = `${airline.code}${100 + i}`;
+
+      // Generate unique departure times (spread throughout the day)
+      const hour = 6 + Math.floor(Math.random() * 14); // 6 AM to 8 PM
+      const minute = Math.floor(Math.random() * 60);
+      const departureTime = `${fromDate}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00`;
+
+      // Calculate realistic duration (3-12 hours)
+      const durationHours = 3 + Math.floor(Math.random() * 10);
+      const durationMinutes = Math.floor(Math.random() * 60);
+      const duration = `PT${durationHours}H${durationMinutes}M`;
+
+      // Calculate arrival time
+      const arrivalDate = new Date(departureTime);
+      arrivalDate.setHours(arrivalDate.getHours() + durationHours);
+      arrivalDate.setMinutes(arrivalDate.getMinutes() + durationMinutes);
+      const arrivalTime = arrivalDate.toISOString().replace('Z', '');
+
+      // Price variation (±20%)
+      const priceVariation = 0.8 + (Math.random() * 0.4);
+      const price = (basePrice * priceVariation * adults).toFixed(2);
+
+      // Stops (0, 1, or 2)
+      const stopsOptions = [0, 0, 0, 1, 1, 2]; // Weighted towards non-stop
+      const stops = stopsOptions[Math.floor(Math.random() * stopsOptions.length)];
+
+      // For stops, generate layover airport
+      const layoverAirports = ['ORD', 'DFW', 'ATL', 'LAX', 'DEN', 'JFK', 'LHR', 'CDG', 'DXB'];
+      const layover = stops > 0 ? layoverAirports[Math.floor(Math.random() * layoverAirports.length)] : null;
+
+      results.push({
+        id: `mock-${origin}-${destination}-${i}`,
+        airlineCode: airline.code,
+        airline: airline.name,
+        flightNumber: flightNum,
+        departure: {
+          airport: origin,
+          time: departureTime,
+          terminal: Math.floor(Math.random() * 5) + 1
+        },
+        arrival: {
+          airport: destination, // FIXED: Use actual destination, not ZVJ
+          time: arrivalTime,
+          terminal: Math.floor(Math.random() * 5) + 1
+        },
+        duration: duration,
+        stops: stops,
+        price: {
+          total: price,
+          currency: 'USD'
+        },
+        class: params.travelClass || 'ECONOMY',
+        source: 'mock',
+        layover: layover
+      });
+    }
+
+    // For round trips, generate return flights
+    if (tripType === 'roundTrip' && toDate) {
+      const returnFlights = this.getMockFlightData({
+        ...params,
+        origin: destination,
+        destination: origin,
+        fromDate: toDate,
+        tripType: 'oneWay'
+      });
+
+      // Combine with outbound flights (in real app, you'd pair them)
+      // For simplicity, we'll just add them as separate one-way options
+      results.push(...returnFlights.map(f => ({
+        ...f,
+        id: f.id.replace('mock-', 'mock-return-'),
+        tripType: 'roundTrip'
+      })));
+    }
+
+    console.log(`Generated ${results.length} unique mock flights for ${origin} → ${destination}`);
     return results;
   }
 

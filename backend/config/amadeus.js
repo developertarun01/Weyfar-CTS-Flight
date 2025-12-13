@@ -6,7 +6,7 @@ try {
   amadeus = new Amadeus({
     clientId: process.env.AMADEUS_API_KEY,
     clientSecret: process.env.AMADEUS_API_SECRET,
-    hostname: 'production' // use 'production' when live
+    hostname: 'test' // use 'production' when live
   });
 
   console.log('Amadeus client initialized successfully');
