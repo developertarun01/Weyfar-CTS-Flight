@@ -84,7 +84,8 @@ class AmadeusService {
 
     // console.log(`📊 Processing ${data.length} raw results from Amadeus`);
 
-    const formatted = data
+    // First pass: process all locations
+    const locations = data
       .map((location, index) => {
         try {
           const result = {
@@ -114,11 +115,68 @@ class AmadeusService {
           return null;
         }
       })
-      .filter(Boolean)
-      .sort((a, b) => b.relevance - a.relevance);
+      .filter(Boolean);
 
-    // console.log(`✅ Successfully formatted ${formatted.length} REAL locations`);
-    return formatted;
+    // Group locations by city for finding the most relevant airport per city
+    const cityGroups = {};
+
+    locations.forEach(location => {
+      if (location.city) {
+        if (!cityGroups[location.city]) {
+          cityGroups[location.city] = [];
+        }
+        cityGroups[location.city].push(location);
+      }
+    });
+
+    // For each city, find the most relevant airport
+    const cityAirportMap = {};
+    Object.keys(cityGroups).forEach(city => {
+      const cityLocations = cityGroups[city];
+
+      // Find city entries first
+      const cityEntry = cityLocations.find(loc => loc.type === 'city');
+      if (cityEntry) {
+        // If city entry exists, use its code
+        cityAirportMap[city] = cityEntry.code;
+      } else {
+        // If no city entry, find the most relevant airport
+        const airports = cityLocations.filter(loc => loc.type === 'airport');
+        if (airports.length > 0) {
+          // Sort airports by relevance and get the highest
+          const mostRelevantAirport = [...airports].sort((a, b) => b.relevance - a.relevance)[0];
+          cityAirportMap[city] = mostRelevantAirport.code;
+        }
+      }
+    });
+
+    // Assign city code to locations without city IATA code
+    const formatted = locations.map(location => {
+      // If this is a city entry, keep its code
+      if (location.type === 'city') {
+        return location;
+      }
+
+      // If this is an airport and its city has a designated code
+      if (location.type === 'airport' && location.city && cityAirportMap[location.city]) {
+        // Create a copy to avoid modifying original
+        const enhancedLocation = { ...location };
+
+        // If the airport doesn't have a city code field, add it
+        // Or if you want to add a separate cityCode field:
+        enhancedLocation.cityCode = cityAirportMap[location.city];
+
+        return enhancedLocation;
+      }
+
+      return location;
+    });
+
+    // Sort by relevance
+    const sorted = formatted.sort((a, b) => b.relevance - a.relevance);
+
+    // console.log(`✅ Successfully formatted ${sorted.length} REAL locations`);
+    return sorted;
   }
 
   // Enhanced mock data (fallback)
@@ -959,11 +1017,11 @@ class AmadeusService {
     });
 
     // CRITICAL: Deduplicate flights from Amadeus
-    const uniqueFlights = this.deduplicateFlights(formattedFlights);
+    // const uniqueFlights = this.deduplicateFlights(formattedFlights);
 
-    console.log(`Filtered ${formattedFlights.length} raw flights to ${uniqueFlights.length} unique flights`);
+    // console.log(`Filtered ${formattedFlights.length} raw flights to ${uniqueFlights.length} unique flights`);
 
-    return uniqueFlights;
+    return formattedFlights;
   }
 
   // Fix the deduplicateFlights method - it should allow same airline, different flights

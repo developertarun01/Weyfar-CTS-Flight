@@ -350,7 +350,7 @@ const Results = () => {
           maxPrice: priceRange.max,
         }));
 
-        // ⭐ Build dynamic airline counts AFTER results are ready
+        // ⭐ Build dynamic airline counts from ALL results (not filtered yet)
         if (searchType === "flights") {
           const counts = {};
           resultsWithDiscount.forEach((f) => {
@@ -362,6 +362,7 @@ const Results = () => {
             Object.entries(counts).map(([name, count]) => ({
               name,
               count,
+              checked: false, // Add initial checked state
             }))
           );
         }
@@ -385,6 +386,37 @@ const Results = () => {
     fetchResults();
   }, [searchType, formData, navigate]);
 
+  // ⭐ NEW useEffect to update dynamicAirlines when filters change
+  useEffect(() => {
+    if (searchType === "flights" && allResults.length > 0) {
+      // Get currently filtered results
+      const filteredResults = applyFilters(allResults);
+
+      // Count airlines in FILTERED results (excluding price and airline filters)
+      const counts = {};
+      filteredResults.forEach((f) => {
+        const airline = f.airline || "Unknown Airline";
+        counts[airline] = (counts[airline] || 0) + 1;
+      });
+
+      // Update dynamicAirlines with counts from FILTERED results
+      setDynamicAirlines((prev) =>
+        prev.map((airline) => ({
+          ...airline,
+          // Preserve checked state, update count from filtered results
+          count: counts[airline.name] || 0,
+        }))
+      );
+    }
+  }, [
+    allResults,
+    filters.sortBy,
+    filters.stops,
+    filters.duration,
+    filters.minPrice,
+    filters.maxPrice,
+  ]); // Only trigger on relevant filter changes
+
   // Update results when filters change
   useEffect(() => {
     if (allResults.length > 0) {
@@ -395,6 +427,76 @@ const Results = () => {
       setHasMore(filteredResults.length > RESULTS_PER_PAGE);
     }
   }, [filters]);
+
+  const getFilteredAirlineCounts = () => {
+    if (searchType !== "flights" || allResults.length === 0) {
+      return dynamicAirlines.filter((airline) => airline.count > 0);
+    }
+
+    // Apply all filters EXCEPT airline filter to get correct counts
+    const filtersWithoutAirlines = {
+      ...filters,
+      airlines: [], // Remove airline filter for counting
+    };
+
+    // Create a temporary applyFilters function without airline filter
+    const applyFiltersWithoutAirlines = (data) => {
+      return data.filter((item) => {
+        const price =
+          parseFloat(item.discountedPrice) || parseFloat(item.originalPrice);
+
+        // Price filter
+        if (
+          price < filtersWithoutAirlines.minPrice ||
+          price > filtersWithoutAirlines.maxPrice
+        ) {
+          return false;
+        }
+
+        // Stops filter
+        if (filtersWithoutAirlines.stops !== "any") {
+          const stops = item.stops || 0;
+          if (filtersWithoutAirlines.stops === "0" && stops !== 0) return false;
+          if (filtersWithoutAirlines.stops === "1" && stops !== 1) return false;
+          if (filtersWithoutAirlines.stops === "2" && stops < 2) return false;
+        }
+
+        // Duration filter
+        if (filtersWithoutAirlines.duration) {
+          const durationHours = parseFloat(
+            item.duration?.replace("PT", "").replace("H", ".") || 3
+          );
+          if (durationHours > filtersWithoutAirlines.duration) return false;
+        }
+
+        return true;
+      });
+    };
+
+    const filteredResults = applyFiltersWithoutAirlines(allResults);
+
+    // Count airlines
+    const counts = {};
+    filteredResults.forEach((f) => {
+      const airline = f.airline || "Unknown Airline";
+      counts[airline] = (counts[airline] || 0) + 1;
+    });
+
+    // Merge with existing dynamicAirlines to preserve checked state, FILTER OUT 0 counts
+    return dynamicAirlines
+      .map((airline) => ({
+        ...airline,
+        count: counts[airline.name] || 0,
+      }))
+      .filter((airline) => airline.count > 0) // ⭐ ONLY SHOW AIRLINES WITH FLIGHTS
+      .sort((a, b) => {
+        // Sort by count descending, then alphabetically
+        if (b.count !== a.count) {
+          return b.count - a.count;
+        }
+        return a.name.localeCompare(b.name);
+      });
+  };
 
   const loadMoreResults = () => {
     setLoadingMore(true);
@@ -674,7 +776,7 @@ const Results = () => {
 
         {/* Range sliders */}
         <div className="space-y-4">
-          <input
+          {/* <input
             type="range"
             min={0}
             max={filters.maxPrice}
@@ -684,7 +786,7 @@ const Results = () => {
               handleFilterChange("minPrice", parseInt(e.target.value))
             }
             className="w-full"
-          />
+          /> */}
           <input
             type="range"
             min={filters.minPrice}
@@ -732,7 +834,7 @@ const Results = () => {
               Airlines
             </label>
             <div className="space-y-2">
-              {dynamicAirlines.map((item) => (
+              {getFilteredAirlineCounts().map((item) => (
                 <label key={item.name} className="flex items-center">
                   <input
                     type="checkbox"
@@ -752,6 +854,13 @@ const Results = () => {
                   </span>
                 </label>
               ))}
+
+              {/* Show message when no airlines match filters */}
+              {getFilteredAirlineCounts().length === 0 && (
+                <p className="text-sm text-gray-500 italic">
+                  No airlines match your current filters
+                </p>
+              )}
             </div>
           </div>
 
