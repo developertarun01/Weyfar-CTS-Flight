@@ -159,8 +159,8 @@ class AmadeusService {
         departureDate: params.fromDate,
         adults: params.adults || 1,
         children: params.children || 0,
-        travelClass: params.travelClass || 'ECONOMY'
-        // max: 150
+        travelClass: params.travelClass || 'ECONOMY',
+        max: 250
       };
 
       // Add return date for round trips
