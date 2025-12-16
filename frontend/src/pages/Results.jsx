@@ -8,6 +8,7 @@ import {
 } from "../services/api";
 import {
   Filter,
+  PenSquare,
   Plane,
   Hotel,
   Car,
@@ -21,6 +22,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import CallBanner from "../components/CallBanner";
+import FlightForm from "../components/forms/FlightForm";
 
 const Results = () => {
   const location = useLocation();
@@ -35,6 +37,7 @@ const Results = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [allResults, setAllResults] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
+  const [showModify, setShowModify] = useState(false);
   const [dynamicAirlines, setDynamicAirlines] = useState([]);
   const [filters, setFilters] = useState({
     // Common filters
@@ -1411,6 +1414,12 @@ const Results = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <CallBanner />
+
+      {searchType === "flights" && showModify && (
+        <div className="bg-white rounded-lg shadow-md p-6 my-6">
+          <FlightForm initialData={formData} />
+        </div>
+      )}
       <div className="flex justify-between items-center mb-6 my-4">
         <div>
           <h2 className="text-xl sm:text-3xl font-bold text-gray-800">
@@ -1433,18 +1442,28 @@ const Results = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center space-x-2 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 relative"
-        >
-          <Filter className="h-4 w-4" />
-          <span>Filters</span>
-          {getActiveFilterCount() > 0 && (
-            <span className="absolute -top-2 -right-2 bg-[var(--primary)] text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
-              {getActiveFilterCount()}
-            </span>
-          )}
-        </button>
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => setShowModify(!showModify)}
+            className="flex items-center space-x-2 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 relative"
+          >
+            <PenSquare className="h-4 w-4" />
+            <span>Modify</span>
+          </button>
+
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center space-x-2 bg-white border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 relative"
+          >
+            <Filter className="h-4 w-4" />
+            <span>Filters</span>
+            {getActiveFilterCount() > 0 && (
+              <span className="absolute -top-2 -right-2 bg-[var(--primary)] text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                {getActiveFilterCount()}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">

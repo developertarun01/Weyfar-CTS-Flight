@@ -12,7 +12,7 @@ import AirportSearchInput from "./AirportSearchInput";
 import { AirportDropdownProvider } from "./AirportDropdownContext";
 import AirportDropdownContainer from "./AirportDropdownContainer";
 
-const FlightForm = () => {
+const FlightForm = ({ initialData = null }) => {
   const navigate = useNavigate();
 
   // Add to your component state
@@ -24,7 +24,7 @@ const FlightForm = () => {
   today2.setDate(today2.getDate() + 5); // ✅ add 5 days
   const fiveDaysLater = today2.toISOString().split("T")[0];
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState(initialData || {
     tripType: "roundTrip",
     origin: "",
     destination: "",
