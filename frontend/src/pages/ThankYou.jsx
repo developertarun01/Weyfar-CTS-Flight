@@ -1,36 +1,19 @@
 import { useRef, useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  CheckCircle,
-  Home,
-  Camera,
-  FileText,
-} from "lucide-react";
+import { CheckCircle, Home, Camera, FileText } from "lucide-react";
+import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 const ThankYou = () => {
   useEffect(() => {
-    // wait a tick to ensure gtag loaded
-    const t = setTimeout(() => {
-      if (typeof window.gtag === "function") {
-        window.gtag("event", "conversion", {
-          send_to: "AW-17169411915/DhP_CMKY088bEMvegfs_",
-          value: 1.0,
-          currency: "INR",
-        });
-      } else {
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({
-          event: "conversion",
-          send_to: "AW-17169411915/DhP_CMKY088bEMvegfs_",
-          value: 1.0,
-          currency: "INR",
-        });
-      }
-    }, 300); // 300ms is safe; adjust if needed
-
-    return () => clearTimeout(t);
+    if (window.gtag) {
+      window.gtag("event", "conversion", {
+        send_to: "AW-17169411915/DhP_CMKY088bEMvegfs_",
+        value: 1.0,
+        currency: "INR",
+      });
+    }
   }, []);
 
   const location = useLocation();
@@ -62,7 +45,7 @@ const ThankYou = () => {
       // For mobile - scroll to callBanner section
       const section1 = document.querySelector(".callBanner");
       if (section1) {
-        const top = section1.offsetTop - 15; // 10px above section1
+        const top = section1.offsetTop; // 10px above section1
         window.scrollTo({ top, behavior: "smooth" });
       }
     } else {
@@ -675,8 +658,12 @@ const ThankYou = () => {
               <p className="text-xl text-gray-600">Booking Confirmation</p>
               <div className="w-32 h-1 bg-green-600 mx-auto mt-4"></div>
               <div className="mt-4 flex flex-col sm:flex-row justify-center space-x-6 text-sm text-gray-600">
-                <div>📞 +1 (888) 808-2182</div>
-                <div>📧 bookingdesk@weyfar.com</div>
+                <Link to="tel:8888082182">
+                  <div>📞 +1 (888) 808-2182</div>
+                </Link>
+                <Link to="mailto:bookingdesk@weyfar.com">
+                  <div>📧 bookingdesk@weyfar.com</div>
+                </Link>
               </div>
             </div>
 
@@ -899,8 +886,12 @@ const ThankYou = () => {
               Our customer support team is here to help you 24/7
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-2 sm:space-y-0 sm:space-x-6 text-gray-700">
-              <span>📧 bookingdesk@weyfar.com</span>
-              <span>📞 +1 (888) 808-2182</span>
+              <Link to="tel:8888082182">
+                <span>📞 +1 (888) 808-2182</span>
+              </Link>
+              <Link to="mailto:bookingdesk@weyfar.com">
+                <span>📧 bookingdesk@weyfar.com</span>
+              </Link>
             </div>
             <div className="text-center mt-6">
               <button

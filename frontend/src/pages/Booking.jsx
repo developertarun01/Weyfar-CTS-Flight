@@ -149,18 +149,31 @@ const Booking = () => {
   };
 
   useEffect(() => {
-    if (window.innerWidth <= 655) {
-      // For mobile - scroll to callBanner section
-      const section1 = document.querySelector(".callBanner");
-      if (section1) {
-        const top = section1.offsetTop - 15; // 10px above section1
-        window.scrollTo({ top, behavior: "smooth" });
+    // Small delay to ensure DOM is fully rendered
+    const timer = setTimeout(() => {
+      // Find the back button in the DOM
+      const backButton = document.querySelector(
+        'button[class*="flex items-center text-[var(--primary)]"]'
+      );
+
+      if (backButton) {
+        // Calculate position just after back button
+        const backButtonRect = backButton.getBoundingClientRect();
+        const targetScrollPosition =
+          backButtonRect.bottom + window.pageYOffset + 10; // 20px padding
+
+        window.scrollTo({
+          top: targetScrollPosition,
+          behavior: "smooth",
+        });
+      } else {
+        // Fallback: scroll to top if back button not found
+        window.scrollTo({ top: 0, behavior: "smooth" });
       }
-    } else {
-      // For desktop - scroll to top of the page
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, []);
+    }, 150); // Slightly longer delay to ensure back button is rendered
+
+    return () => clearTimeout(timer);
+  }, [currentStep]);
 
   const handlePromoCodeApply = async () => {
     if (!promoCode.trim()) return;
