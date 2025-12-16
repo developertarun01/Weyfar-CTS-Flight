@@ -990,6 +990,17 @@ class AmadeusService {
       // Get airline name from code
       const airlineName = getAirlineName(airlineCode) || airlineCode;
 
+      const originalPrice = price.total || '0';
+      const originalCurrency = price.currency || 'USD';
+
+      let usdPrice = originalPrice;
+      if (originalCurrency === "EUR") {
+        const euroAmount = parseFloat(originalPrice);
+        if (!isNaN(euroAmount)) {
+          usdPrice = (euroAmount * 1.17).toFixed(2);
+        }
+      }
+
       return {
         id: offer.id,
         airlineCode: airlineCode,
@@ -1008,8 +1019,8 @@ class AmadeusService {
         duration: itineraries[0]?.duration,
         stops: (itineraries[0]?.segments?.length || 1) - 1,
         price: {
-          total: price.total || '0',
-          currency: price.currency || 'USD'
+          total: usdPrice,
+          currency: 'USD'
         },
         class: offer.class?.[0] || 'ECONOMY',
         source: 'amadeus'
