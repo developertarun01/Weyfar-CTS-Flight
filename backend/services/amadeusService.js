@@ -216,10 +216,15 @@ class AmadeusService {
         destinationLocationCode: params.destination,
         departureDate: params.fromDate,
         adults: params.adults || 1,
-        children: params.children || 0,
         travelClass: params.travelClass || 'ECONOMY',
-        max: 250
+        max: 250,
+        currencyCode: 'USD',
       };
+
+      // ⭐ ONLY add children if it's > 0
+      if (params.children && parseInt(params.children) > 0) {
+        requestParams.children = parseInt(params.children);
+      }
 
       // Add return date for round trips
       if (params.tripType === 'roundTrip' && params.toDate) {
