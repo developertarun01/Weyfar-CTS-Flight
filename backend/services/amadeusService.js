@@ -1027,7 +1027,9 @@ class AmadeusService {
           total: usdPrice,
           currency: 'USD'
         },
-        class: offer.class?.[0] || 'ECONOMY',
+        class: offer.travelerPricings?.[0]
+          ?.fareDetailsBySegment?.[0]
+          ?.cabin,
         source: 'amadeus'
       };
     });
