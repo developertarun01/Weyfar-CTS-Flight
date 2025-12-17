@@ -333,7 +333,7 @@ router.post('/send-receipt-email', async (req, res) => {
             <p style="margin: 0; font-size: 18px; opacity: 0.9;">Booking Details</p>
             <p style="margin: 0; font-size: 15px; opacity: 0.9;">Reach us out for any flight related concerns</p>
 
-<div style="margin-top:16px; display:flex; justify-content: center; gap:20px; font-size:14px;">
+<div style="margin-top:16px; font-size:15px;">
   
   <a href="tel:8888082182" style="text-decoration:none; color:inherit;">
     <div>📞 +1 (888) 808-2182</div>
