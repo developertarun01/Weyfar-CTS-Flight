@@ -224,7 +224,7 @@ const ThankYou = () => {
         {
           to: booking.contactInfo.email,
           type: "customer",
-          subject: `Your Booking Confirmation - ${booking._id}`,
+          subject: `Your Booking Details - ${booking._id}`,
         },
         {
           to: "bookingdesk@weyfar.com",
@@ -556,11 +556,10 @@ const ThankYou = () => {
               <CheckCircle className="h-12 w-12 text-green-600" />
             </div>
             <h1 className="text-4xl font-bold text-green-600 mb-4">
-              Booking Successful!
+              Booking Details!
             </h1>
             <p className="text-xl text-gray-600 mb-2">
-              Thank you for your booking. Your {booking.type} has been
-              confirmed.
+              Thank you for your booking. Your {booking.type} booking is in <b>Process.</b>
             </p>
             <p className="text-lg text-gray-500">
               Booking Reference:{" "}
@@ -654,8 +653,8 @@ const ThankYou = () => {
           >
             {/* Header */}
             <div className="text-center mb-8 border-b pb-6">
-              <h2 className="text-3xl font-bold text-green-700 mb-2">Weyfar</h2>
-              <p className="text-xl text-gray-600">Booking Confirmation</p>
+              <h2 className="text-3xl font-bold text-green-700 mb-2">Weyfar Travel Solution</h2>
+              <p className="text-xl text-gray-600">Booking Details</p>
               <div className="w-32 h-1 bg-green-600 mx-auto mt-4"></div>
               <div className="mt-4 flex flex-col sm:flex-row justify-center space-x-6 text-sm text-gray-600">
                 <Link to="tel:8888082182">
@@ -692,8 +691,8 @@ const ThankYou = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-sm font-semibold">
-                      {booking.status.toUpperCase()}
+                    <span className="bg-yellow-200 px-2 py-1 rounded text-sm font-semibold">
+                      PENDING
                     </span>
                   </div>
                 </div>

@@ -309,7 +309,7 @@ router.post('/send-receipt-email', async (req, res) => {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Booking Confirmation</title>
+        <title>Booking Details</title>
         <style>
           @media only screen and (max-width: 600px) {
             .container {
@@ -329,8 +329,23 @@ router.post('/send-receipt-email', async (req, res) => {
         <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
           <!-- Header -->
           <div style="background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 30px 20px; text-align: center;">
-            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: bold;">Complete Travel Solution</h1>
-            <p style="margin: 0; font-size: 18px; opacity: 0.9;">Booking Confirmation</p>
+            <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: bold;">Weyfar Travel Solution</h1>
+            <p style="margin: 0; font-size: 18px; opacity: 0.9;">Booking Details</p>
+            <p style="margin: 0; font-size: 16px; opacity: 0.9;">Reach us out for any Flight Concern</p>
+            <div style="width:128px; height:4px; background-color:#16a34a; margin:16px auto 0;"></div>
+
+<div style="margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:12px; font-size:14px; color:#4b5563;">
+  
+  <a href="tel:8888082182" style="text-decoration:none; color:inherit;">
+    <div>📞 +1 (888) 808-2182</div>
+  </a>
+
+  <a href="mailto:bookingdesk@weyfar.com" style="text-decoration:none; color:inherit;">
+    <div>📧 bookingdesk@weyfar.com</div>
+  </a>
+
+</div>
+
             <div style="width: 80px; height: 3px; background: white; margin: 20px auto 0 auto; opacity: 0.7;"></div>
           </div>
 
@@ -338,7 +353,7 @@ router.post('/send-receipt-email', async (req, res) => {
           <div style="padding: 30px;">
             <!-- Greeting -->
             <p style="margin-bottom: 25px; font-size: 16px; color: #4b5563;">
-              Thank you for your booking with Complete Travel Solution. Your ${booking.type} has been successfully confirmed.
+              Thank you for your booking with Weyfar Travel Solution. Your ${booking.type} booking is in <b>process</b>.
             </p>
 
             <!-- Booking & Payment Info Grid -->
@@ -363,8 +378,8 @@ router.post('/send-receipt-email', async (req, res) => {
                   </div>
                   <div style="display: flex; justify-content: space-between;">
                     <span style="color: #6b7280; font-size: 14px;">Status:</span>
-                    <span style="background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
-                      ${booking.status}
+                    <span style="background: #fefcbf; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; text-transform: uppercase;">
+                      PENDING
                     </span>
                   </div>
                 </div>
@@ -507,7 +522,7 @@ router.post('/send-receipt-email', async (req, res) => {
           <!-- Footer -->
           <div style="background: #f7fafc; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
             <p style="margin: 0 0 10px 0; font-weight: bold; color: #059669;">
-              Thank you for choosing Complete Travel Solution!
+              Thank you for choosing Weyfar Travel Solution!
             </p>
             <p style="margin: 0 0 10px 0; font-size: 12px; color: #6b7280;">
               This document is electronically generated and valid without signature.
@@ -524,7 +539,7 @@ router.post('/send-receipt-email', async (req, res) => {
 
     const mailOptions = {
       from: {
-        name: 'Complete Travel Solution',
+        name: 'Weyfar Travel Solution',
         address: process.env.EMAIL_USER
       },
       to: to.join(', '),
