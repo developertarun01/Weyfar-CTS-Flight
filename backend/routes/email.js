@@ -331,10 +331,9 @@ router.post('/send-receipt-email', async (req, res) => {
           <div style="background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 30px 20px; text-align: center;">
             <h1 style="margin: 0 0 10px 0; font-size: 28px; font-weight: bold;">Weyfar Travel Solution</h1>
             <p style="margin: 0; font-size: 18px; opacity: 0.9;">Booking Details</p>
-            <p style="margin: 0; font-size: 16px; opacity: 0.9;">Reach us out for any Flight Concern</p>
-            <div style="width:128px; height:4px; background-color:#16a34a; margin:16px auto 0;"></div>
+            <p style="margin: 0; font-size: 15px; opacity: 0.9;">Reach us out for any flight related concerns</p>
 
-<div style="margin-top:16px; display:flex; flex-direction:column; align-items:center; gap:12px; font-size:14px; color:#4b5563;">
+<div style="margin-top:16px; display:flex; justify-content: center; gap:20px; font-size:14px;">
   
   <a href="tel:8888082182" style="text-decoration:none; color:inherit;">
     <div>📞 +1 (888) 808-2182</div>

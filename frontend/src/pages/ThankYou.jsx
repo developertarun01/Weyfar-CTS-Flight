@@ -559,7 +559,7 @@ const ThankYou = () => {
               Booking Details!
             </h1>
             <p className="text-xl text-gray-600 mb-2">
-              Thank you for your booking. Your {booking.type} booking is in <b>Process.</b>
+              Thank you for your booking. Your {booking.type} booking is in <b>process.</b>
             </p>
             <p className="text-lg text-gray-500">
               Booking Reference:{" "}
